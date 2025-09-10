@@ -55,11 +55,37 @@ export default function ItemsList({ showOnlyUserItems = false }) {
     useWaitForTransactionReceipt({ hash })
   const publicClient = usePublicClient()
 
-  const { data: availableItems, refetch: refetchAvailableItems } = useReadContract({
+  // // pour 
+  
+
+  // const { data: availableItems, refetch: refetchAvailableItems } = useReadContract({
+  //   address: contractAddress,
+  //   abi: ABI,
+  //   functionName: 'getAvailableItems',
+  // })
+
+
+    // pour 
+    let  userQuery = {
+    address: contractAddress,
+    abi: ABI,
+    functionName: 'getUserItems',
+    args: [address],
+  }
+
+
+    let availableQuery = {
     address: contractAddress,
     abi: ABI,
     functionName: 'getAvailableItems',
-  })
+
+  }
+
+  let  query =  showOnlyUserItems ? userQuery: availableQuery;
+
+  const { data: availableItems, refetch: refetchAvailableItems } = useReadContract(query as any)
+
+  console.log("available items",availableItems)
 
   // Fonction pour convertir la réponse du contrat en objet Item
   const mapContractResponseToItem = (response: ContractItemResponse, tokenId: bigint): Item => {
@@ -167,7 +193,7 @@ export default function ItemsList({ showOnlyUserItems = false }) {
         filteredItems.map((item) => (
           <Card key={item.tokenId.toString()} className="overflow-hidden">
             <img
-              src={item.imageURI || "https://via.placeholder.com/300"}
+              src={item.imageURI+"/téléchargement.jpg" || "https://via.placeholder.com/300"}
               alt={item.name}
               className="w-full h-48 object-cover"
             />

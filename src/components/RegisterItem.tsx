@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { Button } from './ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
@@ -8,6 +8,7 @@ import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { contractAddress } from '../lib/wagmi'
 import ABI from '@/lib/contract_abi'
+import { parseEther } from "viem";
 
 
 
@@ -27,38 +28,49 @@ export default function RegisterItem() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    writeContract({
+    let  submitData:any = {
       address: contractAddress,
       abi: ABI,
       functionName: 'registerItem',
       args: [
         formData.name,
-        BigInt(formData.value) * BigInt(1e18), // Convertir en wei
+        parseEther('0.1'), // Convertir en wei
         formData.description,
         formData.serialNumber,
-        formData.imageURI || "https://via.placeholder.com/300",
+        formData.imageURI || "https://bafybeibnws2rz2knoq5nyvat2e3o3thhhp3v2ouegyhcfaeodsj2giksou.ipfs.w3s.link",
       ],
-    })
+    };
+    
+    writeContract(submitData)
   }
 
-  if (error) {
-    toast('Erreur',{
-      description: error.message,
-    })
-  }
+  
+  useEffect(()=>{
+    if (error) {
+   
+      toast('Erreur',{
+            description: error.message,
+          })
+    }
 
-  if (isConfirmed) {
-    toast('Item enregistré',{
-      description: 'Votre item a été enregistré avec succès',
-    })
-    setFormData({
-      name: '',
-      value: '',
-      description: '',
-      serialNumber: '',
-      imageURI: ''
-    })
-  }
+  }, [error])
+
+  useEffect(()=>{
+      if (isConfirmed) {
+      toast('Item enregistré',{
+        description: 'Votre item a été enregistré avec succès',
+      })
+      setFormData({
+        name: '',
+        value: '',
+        description: '',
+        serialNumber: '',
+        imageURI: ''
+      })
+    }
+  }, [isConfirmed])
+
+
 
   return (
     <Card className="mt-4">
